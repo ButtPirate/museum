@@ -1,0 +1,1002 @@
+{
+	"info": {
+		"_postman_id": "afd8cd6b-dfe2-46a0-b540-e7b950d11775",
+		"name": "Museum backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17237072"
+	},
+	"item": [
+		{
+			"name": "Test scenarios",
+			"item": [
+				{
+					"name": "Stub controller",
+					"item": [
+						{
+							"name": "Test request",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Server is responding', function() {\r",
+											"    pm.response.to.be.ok;\r",
+											"})"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"var requiredVariables = [\r",
+											"    '$host'\r",
+											"]\r",
+											"\r",
+											"for (var iter in requiredVariables) {\r",
+											"    var variable = requiredVariables[iter]\r",
+											"    if (!pm.collectionVariables.get(variable)) { throw new Error('Required variable {'+variable+'} not set!') }\r",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{$host}}/stub/test",
+									"host": [
+										"{{$host}}"
+									],
+									"path": [
+										"stub",
+										"test"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "API",
+					"item": [
+						{
+							"name": "Item controller",
+							"item": [
+								{
+									"name": "Create item",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status is OK\", function() {\r",
+													"    pm.response.to.be.ok\r",
+													"})\r",
+													"\r",
+													"pm.test(\"Received JSON response\", function() {\r",
+													"    pm.response.to.be.withBody;\r",
+													"     pm.response.to.be.json;\r",
+													"})\r",
+													"\r",
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"pm.test(\"Found created item ID\", function() {\r",
+													"    pm.expect(responseJson.id).to.not.be.eql(null, \"ID is null, item was not saved!\")\r",
+													"})\r",
+													"\r",
+													"const originalItem = JSON.parse(pm.collectionVariables.get('$testItem'))\r",
+													"\r",
+													"pm.test(\"Saved item is the same on response\", function() {\r",
+													"    for (var prop in originalItem) {\r",
+													"        if (Object.prototype.hasOwnProperty.call(originalItem, prop)) {\r",
+													"            pm.expect(responseJson[prop]).to.be.eql(originalItem[prop], \"Saved item is different on response. Prop {\"+prop+\"} is different!\")\r",
+													"        }\r",
+													"    }\r",
+													"})\r",
+													"\r",
+													"pm.collectionVariables.set('$testItemId', responseJson.id);"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"var requiredVariables = [\r",
+													"    '$host',\r",
+													"    '$testItem'\r",
+													"]\r",
+													"\r",
+													"for (var iter in requiredVariables) {\r",
+													"    var variable = requiredVariables[iter]\r",
+													"    if (!pm.collectionVariables.get(variable)) { throw new Error('Required variable {'+variable+'} not set!') }\r",
+													"}\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{{$testItem}}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{$host}}/api/item",
+											"host": [
+												"{{$host}}"
+											],
+											"path": [
+												"api",
+												"item"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get created item",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"var requiredVariables = [\r",
+													"    '$host',\r",
+													"    '$testItemId',\r",
+													"    '$testItem'\r",
+													"]\r",
+													"\r",
+													"for (var iter in requiredVariables) {\r",
+													"    var variable = requiredVariables[iter]\r",
+													"    if (!pm.collectionVariables.get(variable)) { throw new Error('Required variable {'+variable+'} not set!') }\r",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status is OK\", function() {\r",
+													"    pm.response.to.be.ok\r",
+													"})\r",
+													"\r",
+													"pm.test(\"Received JSON response\", function() {\r",
+													"    pm.response.to.be.withBody;\r",
+													"     pm.response.to.be.json;\r",
+													"})\r",
+													"\r",
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"pm.test(\"Retrieved item with correct ID\", function() {\r",
+													"    pm.expect(responseJson.id).to.be.eql(pm.collectionVariables.get('$testItemId'), 'Got item with wrong ID!')\r",
+													"\r",
+													"})\r",
+													"\r",
+													"const originalItem = JSON.parse(pm.collectionVariables.get('$testItem'))\r",
+													"\r",
+													"pm.test(\"Retrieved item is the same\", function() {\r",
+													"    for (var prop in originalItem) {\r",
+													"        if (Object.prototype.hasOwnProperty.call(originalItem, prop)) {\r",
+													"            pm.expect(responseJson[prop]).to.be.eql(originalItem[prop], \"Saved item is different on response. Prop {\"+prop+\"} is different!\")\r",
+													"        }\r",
+													"    }\r",
+													"})\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{$host}}/api/item/{{$testItemId}}",
+											"host": [
+												"{{$host}}"
+											],
+											"path": [
+												"api",
+												"item",
+												"{{$testItemId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Search item",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"var requiredVariables = [\r",
+													"    '$host',\r",
+													"    '$testItem',\r",
+													"    '$testItemId'\r",
+													"]\r",
+													"\r",
+													"for (var iter in requiredVariables) {\r",
+													"    var variable = requiredVariables[iter]\r",
+													"    if (!pm.collectionVariables.get(variable)) { throw new Error('Required variable {'+variable+'} not set!') }\r",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status is OK\", function() {\r",
+													"    pm.response.to.be.ok\r",
+													"})\r",
+													"\r",
+													"pm.test(\"Received JSON response\", function() {\r",
+													"    pm.response.to.be.withBody;\r",
+													"     pm.response.to.be.json;\r",
+													"})\r",
+													"\r",
+													"const responseJson = pm.response.json();\r",
+													"const foundItem = responseJson[0];\r",
+													"\r",
+													"pm.test(\"Retrieved item with correct ID\", function() {\r",
+													"    pm.expect(foundItem.id).to.be.eql(pm.collectionVariables.get('$testItemId'), 'Got item with wrong ID!')\r",
+													"\r",
+													"})\r",
+													"\r",
+													"const originalItem = JSON.parse(pm.collectionVariables.get('$testItem'))\r",
+													"\r",
+													"pm.test(\"Retrieved item is the same\", function() {\r",
+													"    for (var prop in originalItem) {\r",
+													"        if (Object.prototype.hasOwnProperty.call(originalItem, prop)) {\r",
+													"            pm.expect(foundItem[prop]).to.be.eql(originalItem[prop], \"Saved item is different on response. Prop {\"+prop+\"} is different!\")\r",
+													"        }\r",
+													"    }\r",
+													"})\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{$host}}/api/item/search?page=1&pageSize=1&name=Test",
+											"host": [
+												"{{$host}}"
+											],
+											"path": [
+												"api",
+												"item",
+												"search"
+											],
+											"query": [
+												{
+													"key": "page",
+													"value": "1"
+												},
+												{
+													"key": "pageSize",
+													"value": "1"
+												},
+												{
+													"key": "name",
+													"value": "Test"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Edit item",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status is OK\", function() {\r",
+													"    pm.response.to.be.ok\r",
+													"})\r",
+													"\r",
+													"pm.test(\"Received JSON response\", function() {\r",
+													"    pm.response.to.be.withBody;\r",
+													"     pm.response.to.be.json;\r",
+													"})\r",
+													"\r",
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"pm.test(\"Retrieved item with correct ID\", function() {\r",
+													"    pm.expect(responseJson.id).to.be.eql(pm.collectionVariables.get('$testItemId'), 'Got item with wrong ID!')\r",
+													"})\r",
+													"\r",
+													"const editedItem = JSON.parse(pm.collectionVariables.get('$testItemEdited'))\r",
+													"\r",
+													"pm.test(\"Edited item is the same on response\", function() {\r",
+													"    for (var prop in editedItem) {\r",
+													"        if (Object.prototype.hasOwnProperty.call(editedItem, prop)) {\r",
+													"            var errorText = \"Edited item is different on response. Prop {\"+prop+\"} is different!\";\r",
+													"\r",
+													"            if (prop == 'id') {\r",
+													"                pm.expect(responseJson[prop]).to.be.eql(pm.collectionVariables.get('$testItemId'), errorText)\r",
+													"            } else {\r",
+													"                pm.expect(responseJson[prop]).to.be.eql(editedItem[prop], errorText)\r",
+													"            }\r",
+													"        }\r",
+													"    }\r",
+													"})\r",
+													"\r",
+													"pm.collectionVariables.set('$testItemId', responseJson.id);"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"var requiredVariables = [\r",
+													"    '$host',\r",
+													"    '$testItemId',\r",
+													"    '$testItemEdited'\r",
+													"]\r",
+													"\r",
+													"for (var iter in requiredVariables) {\r",
+													"    var variable = requiredVariables[iter]\r",
+													"    if (!pm.collectionVariables.get(variable)) { throw new Error('Required variable {'+variable+'} not set!') }\r",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{{$testItemEdited}}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{$host}}/api/item",
+											"host": [
+												"{{$host}}"
+											],
+											"path": [
+												"api",
+												"item"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get edited item",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"var requiredVariables = [\r",
+													"    '$host',\r",
+													"    '$testItemId',\r",
+													"    '$testItemEdited'\r",
+													"]\r",
+													"\r",
+													"for (var iter in requiredVariables) {\r",
+													"    var variable = requiredVariables[iter]\r",
+													"    if (!pm.collectionVariables.get(variable)) { throw new Error('Required variable {'+variable+'} not set!') }\r",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status is OK\", function() {\r",
+													"    pm.response.to.be.ok\r",
+													"})\r",
+													"\r",
+													"pm.test(\"Received JSON response\", function() {\r",
+													"    pm.response.to.be.withBody;\r",
+													"     pm.response.to.be.json;\r",
+													"})\r",
+													"\r",
+													"const responseJson = pm.response.json();\r",
+													"\r",
+													"const editedItem = JSON.parse(pm.collectionVariables.get('$testItemEdited'))\r",
+													"\r",
+													"\r",
+													"pm.test(\"Retrieved item is edited\", function() {\r",
+													"    for (var prop in editedItem) {\r",
+													"        if (Object.prototype.hasOwnProperty.call(editedItem, prop)) {\r",
+													"            var errorText = \"Edited item is different on response. Prop {\"+prop+\"} is different!\";\r",
+													"\r",
+													"            if (prop == 'id') {\r",
+													"                pm.expect(responseJson[prop]).to.be.eql(pm.collectionVariables.get('$testItemId'), errorText)\r",
+													"            } else {\r",
+													"                pm.expect(responseJson[prop]).to.be.eql(editedItem[prop], errorText)\r",
+													"            }\r",
+													"        }\r",
+													"    }\r",
+													"})"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{$host}}/api/item/{{$testItemId}}",
+											"host": [
+												"{{$host}}"
+											],
+											"path": [
+												"api",
+												"item",
+												"{{$testItemId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete item",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"var requiredVariables = [\r",
+													"    '$host',\r",
+													"    '$testItemId'\r",
+													"]\r",
+													"\r",
+													"for (var iter in requiredVariables) {\r",
+													"    var variable = requiredVariables[iter]\r",
+													"    if (!pm.collectionVariables.get(variable)) { throw new Error('Required variable {'+variable+'} not set!') }\r",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status is OK\", function() {\r",
+													"    pm.response.to.be.ok\r",
+													"})"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{$host}}/api/item/{{$testItemId}}",
+											"host": [
+												"{{$host}}"
+											],
+											"path": [
+												"api",
+												"item",
+												"{{$testItemId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Ensure item is deleted",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"var requiredVariables = [\r",
+													"    '$host',\r",
+													"    '$testItemId'\r",
+													"]\r",
+													"\r",
+													"for (var iter in requiredVariables) {\r",
+													"    var variable = requiredVariables[iter]\r",
+													"    if (!pm.collectionVariables.get(variable)) { throw new Error('Required variable {'+variable+'} not set!') }\r",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status is 404\", function() {\r",
+													"    pm.response.to.be.notFound\r",
+													"})"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{$host}}/api/item/{{$testItemId}}",
+											"host": [
+												"{{$host}}"
+											],
+											"path": [
+												"api",
+												"item",
+												"{{$testItemId}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Debug",
+			"item": [
+				{
+					"name": "/stub",
+					"item": [
+						{
+							"name": "/test",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"var requiredVariables = [\r",
+											"    '$host'\r",
+											"]\r",
+											"\r",
+											"for (var iter in requiredVariables) {\r",
+											"    var variable = requiredVariables[iter]\r",
+											"    if (!pm.collectionVariables.get(variable)) { throw new Error('Required variable {'+variable+'} not set!') }\r",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{$host}}/stub/test",
+									"host": [
+										"{{$host}}"
+									],
+									"path": [
+										"stub",
+										"test"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "/api",
+					"item": [
+						{
+							"name": "/item",
+							"item": [
+								{
+									"name": "/",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"var requiredVariables = [\r",
+													"    '$host'\r",
+													"]\r",
+													"\r",
+													"for (var iter in requiredVariables) {\r",
+													"    var variable = requiredVariables[iter]\r",
+													"    if (!pm.collectionVariables.get(variable)) { throw new Error('Required variable {'+variable+'} not set!') }\r",
+													"}\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"id\": null,\r\n  \"name\": \"Test name\",\r\n  \"circa\": \"Test circa\",\r\n  \"comment\": \"Test comment\",\r\n  \"invNumber\": \"Test invNumber\",\r\n  \"origin\": \"Test origin\",\r\n  \"placement\": \"Test placement\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{$host}}/api/item",
+											"host": [
+												"{{$host}}"
+											],
+											"path": [
+												"api",
+												"item"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/{id}",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"var requiredVariables = [\r",
+													"    '$host'\r",
+													"]\r",
+													"\r",
+													"for (var iter in requiredVariables) {\r",
+													"    var variable = requiredVariables[iter]\r",
+													"    if (!pm.collectionVariables.get(variable)) { throw new Error('Required variable {'+variable+'} not set!') }\r",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{$host}}/api/item/1",
+											"host": [
+												"{{$host}}"
+											],
+											"path": [
+												"api",
+												"item",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/search",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"var requiredVariables = [\r",
+													"    '$host'\r",
+													"]\r",
+													"\r",
+													"for (var iter in requiredVariables) {\r",
+													"    var variable = requiredVariables[iter]\r",
+													"    if (!pm.collectionVariables.get(variable)) { throw new Error('Required variable {'+variable+'} not set!') }\r",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{$host}}/api/item/search?page=1&pageSize=10",
+											"host": [
+												"{{$host}}"
+											],
+											"path": [
+												"api",
+												"item",
+												"search"
+											],
+											"query": [
+												{
+													"key": "page",
+													"value": "1"
+												},
+												{
+													"key": "pageSize",
+													"value": "10"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/smart-search",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"var requiredVariables = [\r",
+													"    '$host'\r",
+													"]\r",
+													"\r",
+													"for (var iter in requiredVariables) {\r",
+													"    var variable = requiredVariables[iter]\r",
+													"    if (!pm.collectionVariables.get(variable)) { throw new Error('Required variable {'+variable+'} not set!') }\r",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{$host}}/api/item/smart-search?page=1&pageSize=10&query",
+											"host": [
+												"{{$host}}"
+											],
+											"path": [
+												"api",
+												"item",
+												"smart-search"
+											],
+											"query": [
+												{
+													"key": "page",
+													"value": "1"
+												},
+												{
+													"key": "pageSize",
+													"value": "10"
+												},
+												{
+													"key": "query",
+													"value": null
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/tooltip",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"var requiredVariables = [\r",
+													"    '$host'\r",
+													"]\r",
+													"\r",
+													"for (var iter in requiredVariables) {\r",
+													"    var variable = requiredVariables[iter]\r",
+													"    if (!pm.collectionVariables.get(variable)) { throw new Error('Required variable {'+variable+'} not set!') }\r",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{$host}}/api/item/search?fieldName&query",
+											"host": [
+												"{{$host}}"
+											],
+											"path": [
+												"api",
+												"item",
+												"search"
+											],
+											"query": [
+												{
+													"key": "fieldName",
+													"value": null
+												},
+												{
+													"key": "query",
+													"value": null
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"var requiredVariables = [\r",
+													"    '$host'\r",
+													"]\r",
+													"\r",
+													"for (var iter in requiredVariables) {\r",
+													"    var variable = requiredVariables[iter]\r",
+													"    if (!pm.collectionVariables.get(variable)) { throw new Error('Required variable {'+variable+'} not set!') }\r",
+													"}"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{$host}}/api/item/1",
+											"host": [
+												"{{$host}}"
+											],
+											"path": [
+												"api",
+												"item",
+												"1"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "$host",
+			"value": "http://localhost:8080"
+		},
+		{
+			"key": "$testItem",
+			"value": "{\n  \"name\": \"Test name\",\n  \"circa\": \"Test circa\",\n  \"comment\": \"Test comment\",\n  \"invNumber\": \"Test invNumber\",\n  \"origin\": \"Test origin\",\n  \"placement\": \"Test placement\"\n}",
+			"type": "string"
+		},
+		{
+			"key": "$testItemId",
+			"value": ""
+		},
+		{
+			"key": "$testItemEdited",
+			"value": "{\n  \"id\": \"{{$testItemId}}\",\n  \"name\": \"Edited name\",\n  \"circa\": \"Edited circa\",\n  \"comment\": \"Edited comment\",\n  \"invNumber\": \"Edited invNumber\",\n  \"origin\": \"Edited origin\",\n  \"placement\": \"Edited placement\"\n}",
+			"type": "string"
+		}
+	]
+}
