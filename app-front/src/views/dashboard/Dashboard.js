@@ -160,7 +160,7 @@ class DashboardStore {
   @action
   editItemFormOnChange = (newValue, fieldName) => {
     this.openItem[fieldName] = newValue;
-    this.tooltip(fieldName, this.filter[fieldName])
+    this.tooltip(fieldName, this.openItem[fieldName])
   }
 
   @action
