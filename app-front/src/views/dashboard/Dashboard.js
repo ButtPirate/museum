@@ -446,6 +446,10 @@ const Pagination = observer(
             <li className={"page-item " + (dashboardStore.page === dashboardStore.pagination.totalPages ? 'disabled' : '')}>
               <button className="page-link" onClick={ () => {changePageOnClick(1); } }>Следующая</button>
             </li>
+
+            <li className="page-item disabled ms-auto">
+              {'Всего: ' + dashboardStore.pagination.total}
+            </li>
           </ul>
         </nav>
       </>
