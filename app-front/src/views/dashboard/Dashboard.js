@@ -516,12 +516,7 @@ const ModalForm = observer(
           <CRow>
             <CCol>
               <div className="mb-3">
-                <CFormLabel htmlFor="openItemModal_form_name">Название</CFormLabel>
-                <CFormInput type="text"
-                            id="openItemModal_form_name"
-                            placeholder="Название"
-                            value={_.get(dashboardStore, "openItem.name")}
-                            onChange={ (e) => {dashboardStore.editItemFormOnChange(e.target.value, 'name')} }/>
+                <ModalTooltipField prettyName='Название' fieldName='name'/>
               </div>
             </CCol>
           </CRow>
@@ -529,12 +524,7 @@ const ModalForm = observer(
           <CRow>
             <CCol>
               <div className="mb-3">
-                <CFormLabel htmlFor="openItemModal_form_invNumber">Инвентарный номер</CFormLabel>
-                <CFormInput type="text"
-                            id="openItemModal_form_invNumber"
-                            placeholder="Инвентарный номер"
-                            value={_.get(dashboardStore, "openItem.invNumber")}
-                            onChange={ (e) => {dashboardStore.editItemFormOnChange(e.target.value, 'invNumber')} }/>
+                <ModalTooltipField prettyName='Инвентарный номер' fieldName='invNumber'/>
               </div>
             </CCol>
 
